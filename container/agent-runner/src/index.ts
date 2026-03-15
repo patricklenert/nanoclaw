@@ -645,10 +645,13 @@ async function main(): Promise<void> {
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
     log(`Agent error: ${errorMessage}`);
+    // Don't return the stale session ID if the session no longer exists —
+    // returning it would cause the host to keep retrying with the same dead ID.
+    const sessionNotFound = errorMessage.includes('No conversation found with session ID');
     writeOutput({
       status: 'error',
       result: null,
-      newSessionId: sessionId,
+      newSessionId: sessionNotFound ? undefined : sessionId,
       error: errorMessage
     });
     process.exit(1);
