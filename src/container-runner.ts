@@ -122,6 +122,8 @@ function buildVolumeMounts(
     '.claude',
   );
   fs.mkdirSync(groupSessionsDir, { recursive: true });
+  // World-writable so the container's non-root node user (uid 1000) can persist sessions
+  fs.chmodSync(groupSessionsDir, 0o777);
   const settingsFile = path.join(groupSessionsDir, 'settings.json');
   if (!fs.existsSync(settingsFile)) {
     fs.writeFileSync(
@@ -166,9 +168,18 @@ function buildVolumeMounts(
   // Per-group IPC namespace: each group gets its own IPC directory
   // This prevents cross-group privilege escalation via IPC
   const groupIpcDir = resolveGroupIpcPath(group.folder);
-  fs.mkdirSync(path.join(groupIpcDir, 'messages'), { recursive: true, mode: 0o777 });
-  fs.mkdirSync(path.join(groupIpcDir, 'tasks'), { recursive: true, mode: 0o777 });
-  fs.mkdirSync(path.join(groupIpcDir, 'input'), { recursive: true, mode: 0o777 });
+  fs.mkdirSync(path.join(groupIpcDir, 'messages'), {
+    recursive: true,
+    mode: 0o777,
+  });
+  fs.mkdirSync(path.join(groupIpcDir, 'tasks'), {
+    recursive: true,
+    mode: 0o777,
+  });
+  fs.mkdirSync(path.join(groupIpcDir, 'input'), {
+    recursive: true,
+    mode: 0o777,
+  });
   // Ensure world-writable so the container's non-root user can delete files
   fs.chmodSync(groupIpcDir, 0o777);
   fs.chmodSync(path.join(groupIpcDir, 'messages'), 0o777);
