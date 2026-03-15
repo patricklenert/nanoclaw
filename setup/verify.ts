@@ -112,6 +112,7 @@ export async function run(_args: string[]): Promise<void> {
     'SLACK_BOT_TOKEN',
     'SLACK_APP_TOKEN',
     'DISCORD_BOT_TOKEN',
+    'MATTERMOST_TOKEN',
   ]);
 
   const channelAuth: Record<string, string> = {};
@@ -134,6 +135,9 @@ export async function run(_args: string[]): Promise<void> {
   }
   if (process.env.DISCORD_BOT_TOKEN || envVars.DISCORD_BOT_TOKEN) {
     channelAuth.discord = 'configured';
+  }
+  if (process.env.MATTERMOST_TOKEN || envVars['MATTERMOST_TOKEN']) {
+    channelAuth.mattermost = 'configured';
   }
 
   const configuredChannels = Object.keys(channelAuth);
